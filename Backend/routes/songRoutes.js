@@ -38,7 +38,7 @@ router.put('/:id', protect, async (req, res) => {
     const updatedSong = await Song.findByIdAndUpdate(
       req.params.id,
       req.body, // Replaces fields including the sections array
-      { new: true }
+      { returnDocument: 'after' }
     );
     res.json(updatedSong);
   } catch (error) {

@@ -23,18 +23,31 @@ export default function Workspace() {
   const handleUpdateSong = (updatedFields: Partial<Song>) => {
     if (!song) return;
 
-    // 1. Optimistic UI Update (instant response for the creator)
+    // 1. Optimistic UI Update
     const updatedSong = { ...song, ...updatedFields };
     setSong(updatedSong);
 
-    // 2. Clear the previous timer if they are still making changes
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
 
-    // 3. Set a new timer to save after 1 second of inactivity
     setIsSaving(true);
     saveTimeoutRef.current = setTimeout(async () => {
       try {
-        await api.updateSong(updatedSong._id, updatedFields);
+        // Create a clean copy of the payload
+        const payloadToSave = { ...updatedFields };
+
+        // If sections are being updated, strip out any fake UUIDs before sending to MongoDB
+        if (payloadToSave.sections) {
+          payloadToSave.sections = payloadToSave.sections.map(section => {
+            // If the _id is not a 24-character hex string (MongoDB format), remove it
+            if (section._id && section._id.length !== 24) {
+              const { _id, ...cleanSection } = section;
+              return cleanSection;
+            }
+            return section;
+          });
+        }
+
+        await api.updateSong(updatedSong._id, payloadToSave);
       } catch (err) {
         console.error('Save failed:', err);
       } finally {
