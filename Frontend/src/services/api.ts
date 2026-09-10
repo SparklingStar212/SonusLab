@@ -42,4 +42,11 @@ export const api = {
     if (!res.ok) throw new Error("Failed to save project");
     return res.json();
   },
+  deleteSong: async (id: string): Promise<void> => {
+    const res = await fetch(`${BASE_URL}/songs/${id}`, {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
+    if (!res.ok) throw new Error("Failed to delete project");
+  },
 };

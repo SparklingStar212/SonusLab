@@ -61,4 +61,20 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
+// Delete a song project
+router.delete('/:id', protect, async (req, res) => {
+  try {
+    const song = await Song.findById(req.params.id);
+
+    if (!song) return res.status(404).json({ message: 'Song not found' });
+    if (song.user.toString() !== req.user.id) return res.status(401).json({ message: 'Not authorized' });
+
+    await song.deleteOne();
+    res.json({ message: 'Track deleted successfully' });
+  } catch (error) {
+    console.error('Delete Error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

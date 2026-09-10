@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import WorkspaceHeader from '../components/workspace/WorkspaceHeader';
 import SectionBoard from '../components/workspace/SectionBoard';
 import type { Song, Section } from '../types';
@@ -7,6 +7,7 @@ import { api } from '../services/api';
 
 export default function Workspace() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate(); // <-- 1. Initialize navigate here
   const [song, setSong] = useState<Song | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -56,11 +57,31 @@ export default function Workspace() {
     }, 1000);
   };
 
+  const handleDeleteSong = async () => {
+    if (!song) return;
+
+    // Safety check
+    if (window.confirm('Are you sure you want to delete this track? This cannot be undone.')) {
+      try {
+        await api.deleteSong(song._id);
+        navigate('/'); // Kick them back to the dashboard
+      } catch (err) {
+        console.error('Failed to delete:', err);
+        alert('Failed to delete the track. Please try again.');
+      }
+    }
+  };
+
   if (!song) return <div className="h-full flex items-center justify-center text-zinc-500">Loading tape...</div>;
 
   return (
     <div className="min-h-full flex flex-col relative bg-zinc-950">
-      <WorkspaceHeader song={song} onUpdateSong={handleUpdateSong} isSaving={isSaving} />
+      <WorkspaceHeader
+        song={song}
+        onUpdateSong={handleUpdateSong}
+        onDeleteSong={handleDeleteSong} // <-- 2. Moved to WorkspaceHeader
+        isSaving={isSaving}
+      />
       <main className="flex-1 p-4 md:p-8 max-w-3xl w-full mx-auto">
         <SectionBoard
           sections={song.sections}

@@ -44,12 +44,12 @@ export default function SectionBlock({ section, onContentChange, onRemove }: Sec
           </div>
         </div>
 
-        {/* Standard Lyric Text Area */}
+        {/* Standard Lyric Text Area with hidden scrollbar */}
         <textarea
           value={section.content}
           onChange={(e) => onContentChange(e.target.value)}
           placeholder={`Write your ${section.type.toLowerCase()} here...`}
-          className="w-full bg-transparent text-zinc-300 placeholder:text-zinc-700 p-4 min-h-30 resize-y border-none focus:outline-none focus:ring-0 text-base md:text-lg leading-relaxed flex-1"
+          className="w-full bg-transparent text-zinc-300 placeholder:text-zinc-700 p-4 min-h-30 resize-y border-none focus:outline-none focus:ring-0 text-base md:text-lg leading-relaxed flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] scrollbar-none"
           spellCheck="false"
         />
       </div>
