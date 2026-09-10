@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -29,6 +30,24 @@ export default function Login() {
       setError(err.message);
     } finally {
       setIsLoading(false);
+    }
+  }; // <-- handleSubmit closes here
+
+  // handleGoogleSuccess is now properly scoped
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Google Auth failed');
+
+      login({ _id: data._id, name: data.name }, data.token);
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
@@ -71,6 +90,24 @@ export default function Login() {
             {isLoading ? 'Connecting...' : 'Login'}
           </button>
         </form>
+
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <div className="h-px bg-zinc-800 flex-1"></div>
+          <span className="text-zinc-500 text-xs uppercase font-bold tracking-wider">Or</span>
+          <div className="h-px bg-zinc-800 flex-1"></div>
+        </div>
+
+        <div className="mt-6 flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Sign-In was unsuccessful')}
+            theme="filled_black"
+            shape="rectangular"
+            size="large"
+            text="continue_with"
+            width="100%"
+          />
+        </div>
 
         <p className="text-center text-zinc-500 text-sm mt-6">
           Need a workspace? <Link to="/register" className="text-amber-500 hover:underline">Create account</Link>
