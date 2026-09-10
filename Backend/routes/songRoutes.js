@@ -46,4 +46,18 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
+// Get a single song by ID
+router.get('/:id', protect, async (req, res) => {
+  try {
+    const song = await Song.findById(req.params.id);
+
+    if (!song) return res.status(404).json({ message: 'Song not found' });
+    if (song.user.toString() !== req.user.id) return res.status(401).json({ message: 'Not authorized' });
+
+    res.json(song);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
