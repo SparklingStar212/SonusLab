@@ -13,7 +13,6 @@ export default function SectionBoard({ sections, onUpdateSections }: SectionBoar
 
   const handleAddSection = (type: Section['type']) => {
     const newSection: Section = {
-      _id: crypto.randomUUID(), // Generates a temporary unique ID for React rendering
       type,
       content: '',
       order: sections.length

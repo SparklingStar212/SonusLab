@@ -42,6 +42,7 @@ router.put('/:id', protect, async (req, res) => {
     );
     res.json(updatedSong);
   } catch (error) {
+    console.error('Save Error:', error.message); // <-- This will tell you exactly what MongoDB is complaining about next time
     res.status(500).json({ message: 'Server error' });
   }
 });

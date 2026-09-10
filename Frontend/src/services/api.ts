@@ -13,19 +13,19 @@ const getHeaders = () => {
 
 export const api = {
   getSongs: async (): Promise<Song[]> => {
-    const res = await fetch(`${BASE_URL}/songs`, { headers: getHeaders() });
+    const res = await fetch(`${BASE_URL}/api/songs`, { headers: getHeaders() });
     if (!res.ok) throw new Error("Failed to fetch projects");
     return res.json();
   },
   getSong: async (id: string): Promise<Song> => {
-    const res = await fetch(`${BASE_URL}/songs/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/songs/${id}`, {
       headers: getHeaders(),
     });
     if (!res.ok) throw new Error("Failed to fetch project");
     return res.json();
   },
   createSong: async (title: string = "Untitled Track"): Promise<Song> => {
-    const res = await fetch(`${BASE_URL}/songs`, {
+    const res = await fetch(`${BASE_URL}/api/songs`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ title }),
@@ -34,7 +34,7 @@ export const api = {
     return res.json();
   },
   updateSong: async (id: string, updates: Partial<Song>): Promise<Song> => {
-    const res = await fetch(`${BASE_URL}/songs/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/songs/${id}`, {
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(updates),
