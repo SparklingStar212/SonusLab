@@ -1,23 +1,48 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import Workspace from './pages/Workspace';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
-// Temporary placeholder components
-const Dashboard = () => <div className="p-6"><h1 className="text-2xl font-bold text-zinc-100">Projects</h1></div>;
-const Workspace = () => <div className="p-6"><h1 className="text-2xl font-bold text-zinc-100">Workspace</h1></div>;
-const Settings = () => <div className="p-6"><h1 className="text-2xl font-bold text-zinc-100">Settings</h1></div>;
+// Protects internal routes
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token } = useAuth();
+  if (!token) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+};
 
-function App() {
+// Prevent logged-in users from seeing auth pages
+const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token } = useAuth();
+  if (token) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
+
+function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="workspace" element={<Workspace />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      {/* Public Auth Routes */}
+      <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+      <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
+
+      {/* Private Studio Routes */}
+      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route index element={<Dashboard />} />
+        <Route path="workspace/:id" element={<Workspace />} />
+        <Route path="settings" element={<div className="p-8 text-zinc-100">Settings coming soon</div>} />
+      </Route>
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
