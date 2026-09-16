@@ -17,6 +17,22 @@ const sectionSchema = new mongoose.Schema({
   }
 });
 
+// V2: The new Chord schema for the Chord Lab
+const chordSchema = new mongoose.Schema({
+  root: {
+    type: String,
+    required: true
+  },
+  quality: {
+    type: String,
+    default: ''
+  },
+  order: {
+    type: Number,
+    required: true
+  }
+});
+
 // The main project container
 const songSchema = new mongoose.Schema({
   user: {
@@ -31,10 +47,11 @@ const songSchema = new mongoose.Schema({
   metadata: {
     genre: { type: String, default: '' },
     mood: { type: String, default: '' },
-    key: { type: String, default: 'C Major' },
+    key: { type: String, default: 'C Major' }, // Note: We will use this exact string in Step 2
     bpm: { type: Number, default: 120 }
   },
   sections: [sectionSchema],
+  progression: [chordSchema], // <-- V2: The chord timeline data lives here
   creativeNotes: {
     type: String,
     default: ''

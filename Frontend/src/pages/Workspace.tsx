@@ -17,7 +17,13 @@ export default function Workspace() {
   useEffect(() => {
     if (!id) return;
     api.getSong(id)
-      .then(setSong)
+      .then(fetchedSong => {
+        // Fallback for older V1 saves that lack the progression array
+        setSong({
+          ...fetchedSong,
+          progression: fetchedSong.progression || []
+        });
+      })
       .catch(err => console.error("Failed to load tape:", err));
   }, [id]);
 

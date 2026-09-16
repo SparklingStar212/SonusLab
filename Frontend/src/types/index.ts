@@ -12,6 +12,14 @@ export interface Section {
   order: number;
 }
 
+// New Chord Interface for V2
+export interface Chord {
+  _id?: string;
+  root: string; // e.g., 'C', 'F#', 'Bb'
+  quality: string; // e.g., 'maj7', 'm', 'dim', or '' for simple major
+  order: number;
+}
+
 export interface Song {
   _id: string;
   title: string;
@@ -22,5 +30,6 @@ export interface Song {
     bpm: number;
   };
   sections: Section[];
+  progression: Chord[]; // <-- The new Chord Lab data array
   updatedAt: string;
 }
