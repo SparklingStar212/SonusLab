@@ -54,33 +54,42 @@ const getNotesForChord = (root: string, quality: string): string[] => {
 
 // 3. Export the engine methods
 export const audioEngine = {
-
   // NEW: Set the global BPM based on the workspace header
   setBpm: (bpm: number) => {
     Tone.Transport.bpm.value = bpm;
   },
 
   // NEW: The core sequencer logic
-  playProgression: async (chords: {root: string, quality: string}[], bpm: number) => {
+  // NEW: Notice the onTick callback we added here
+  playProgression: async (
+    chords: { root: string; quality: string }[],
+    bpm: number,
+    onTick?: (index: number) => void, // <-- Pass UI updates through here
+  ) => {
     await Tone.start();
     Tone.Transport.stop();
-    Tone.Transport.cancel(); // Clear any old sequences
+    Tone.Transport.cancel();
 
     audioEngine.setBpm(bpm);
 
-    // Map our chord array into Tone.js timing events (1 chord per beat/measure)
-    // We are using '1m' (one measure) per chord so you have time to flatpick over it!
+    // Include the index in our sequence data so we know which block is playing
     const sequenceData = chords.map((chord, index) => ({
-      time: `${index}m`, 
-      notes: getNotesForChord(chord.root, chord.quality)
+      time: `${index}m`,
+      index: index, // <-- Track the index
+      notes: getNotesForChord(chord.root, chord.quality),
     }));
 
-    // Create the Tone.js Part to handle playback scheduling
     const part = new Tone.Part((time, value) => {
-      synth.triggerAttackRelease(value.notes, '1m', time);
+      synth.triggerAttackRelease(value.notes, "1m", time);
+
+      // Tone.Draw safely pushes the update to React at the exact millisecond the chord plays
+      if (onTick) {
+        Tone.Draw.schedule(() => {
+          onTick(value.index);
+        }, time);
+      }
     }, sequenceData).start(0);
 
-    // Tell the transport to loop exactly the length of our progression
     Tone.Transport.loop = true;
     Tone.Transport.loopEnd = `${chords.length}m`;
 

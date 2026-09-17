@@ -5,10 +5,11 @@ import type { Chord } from '../../types';
 interface ProgressionTimelineProps {
   chords: Chord[];
   onRemoveChord: (index: number) => void;
-  onReorderChords: (reorderedChords: Chord[]) => void; // <-- This is the fix!
+  onReorderChords: (reorderedChords: Chord[]) => void;
+  activeIndex: number | null;
 }
 
-export default function ProgressionTimeline({ chords, onRemoveChord, onReorderChords }: ProgressionTimelineProps) {
+export default function ProgressionTimeline({ chords, onRemoveChord, onReorderChords, activeIndex }: ProgressionTimelineProps) {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const handleDragStart = (index: number) => setDraggedIndex(index);
@@ -54,7 +55,13 @@ export default function ProgressionTimeline({ chords, onRemoveChord, onReorderCh
                 onDragStart={() => handleDragStart(index)}
                 onDragOver={handleDragOver}
                 onDrop={() => handleDrop(index)}
-                className={`group relative shrink-0 w-24 h-28 bg-zinc-900 border border-zinc-700 rounded-xl flex flex-col items-center justify-center hover:border-amber-500/50 hover:bg-zinc-800 transition-all shadow-sm cursor-grab active:cursor-grabbing ${draggedIndex === index ? 'opacity-40' : 'opacity-100'}`}
+                className={`group relative shrink-0 w-24 h-28 border rounded-xl flex flex-col items-center justify-center transition-all shadow-sm cursor-grab active:cursor-grabbing
+              ${draggedIndex === index ? 'opacity-40' : 'opacity-100'} 
+              ${activeIndex === index
+                    ? 'bg-amber-500/10 border-amber-500 ring-2 ring-amber-500/50 scale-105 z-10' // Active playing glow
+                    : 'bg-zinc-900 border-zinc-700 hover:border-amber-500/50 hover:bg-zinc-800' // Normal state
+                  }
+            `}
               >
                 <div className="absolute top-2 w-full flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <GripHorizontal className="w-4 h-4 text-zinc-600" />

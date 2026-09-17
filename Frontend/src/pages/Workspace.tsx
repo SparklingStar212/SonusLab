@@ -103,6 +103,8 @@ export default function Workspace() {
     handleUpdateSong({ progression: reorderedChords });
   };
 
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+
   if (!song) return <div className="h-full flex items-center justify-center text-zinc-500">Loading tape...</div>;
 
   return (
@@ -123,12 +125,15 @@ export default function Workspace() {
         <StudioTransport
           bpm={song.metadata.bpm}
           chords={song.progression}
+          onTick={setPlayingIndex}
         />
 
+        {/* Pass the active index to the Timeline so it can highlight */}
         <ProgressionTimeline
           chords={song.progression}
           onRemoveChord={handleRemoveChord}
           onReorderChords={handleReorderChords}
+          activeIndex={playingIndex}
         />
 
         <SectionBoard

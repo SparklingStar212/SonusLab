@@ -6,9 +6,10 @@ import type { Chord } from '../../types';
 interface StudioTransportProps {
   chords: Chord[];
   bpm: number;
+  onTick: (index: number | null) => void;
 }
 
-export default function StudioTransport({ chords, bpm }: StudioTransportProps) {
+export default function StudioTransport({ chords, bpm, onTick }: StudioTransportProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   // Safety cleanup: stop audio if the user leaves the page
@@ -16,15 +17,25 @@ export default function StudioTransport({ chords, bpm }: StudioTransportProps) {
     return () => audioEngine.stop();
   }, []);
 
+  // Safety cleanup: stop audio if all chords are deleted while playing
+  useEffect(() => {
+    if (chords.length === 0 && isPlaying) {
+      audioEngine.stop();
+      setIsPlaying(false);
+      onTick(null);
+    }
+  }, [chords.length, isPlaying, onTick]);
+
   const togglePlayback = async () => {
     if (chords.length === 0) return;
 
     if (isPlaying) {
       audioEngine.stop();
       setIsPlaying(false);
+      onTick(null); // <-- Reset highlight when stopped
     } else {
-      await audioEngine.playProgression(chords, bpm);
       setIsPlaying(true);
+      await audioEngine.playProgression(chords, bpm, onTick); // <-- Pass it to Tone.js
     }
   };
 
