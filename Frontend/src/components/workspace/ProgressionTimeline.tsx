@@ -1,0 +1,67 @@
+import { X, GripHorizontal } from 'lucide-react';
+import type { Chord } from '../../types';
+
+interface ProgressionTimelineProps {
+  chords: Chord[];
+  onRemoveChord: (index: number) => void;
+}
+
+export default function ProgressionTimeline({ chords, onRemoveChord }: ProgressionTimelineProps) {
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between px-1 mb-2">
+        <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Progression Timeline</h3>
+        <span className="text-xs text-zinc-600 font-medium">
+          {chords.length > 0 ? `${chords.length} blocks` : 'Empty'}
+        </span>
+      </div>
+
+      {/* The Sequencer Lane */}
+      <div className="bg-zinc-950/50 border border-zinc-800/80 rounded-xl p-4 min-h-35 flex items-center overflow-x-auto shadow-inner [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] scrollbar-none">
+
+        {/* Empty State */}
+        {chords.length === 0 ? (
+          <div className="w-full flex flex-col items-center justify-center text-zinc-500 space-y-2 h-full">
+            <div className="w-16 h-16 border-2 border-dashed border-zinc-800 rounded-xl flex items-center justify-center mb-2">
+              <span className="text-2xl text-zinc-700">+</span>
+            </div>
+            <p className="text-sm font-medium">No chords in this progression yet.</p>
+            <p className="text-xs">Tap chords from the palette above to start building.</p>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            {/* Active Chord Track */}
+            {chords.map((chord, index) => (
+              <div
+                key={chord._id || `chord-${index}`}
+                className="group relative shrink-0 w-24 h-28 bg-zinc-900 border border-zinc-700 rounded-xl flex flex-col items-center justify-center hover:border-amber-500/50 hover:bg-zinc-800 transition-all shadow-sm"
+              >
+                {/* Drag Handle (Visual prep for Step 6) */}
+                <div className="absolute top-2 w-full flex justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-grab">
+                  <GripHorizontal className="w-4 h-4 text-zinc-600 hover:text-zinc-400" />
+                </div>
+
+                {/* The Chord Data */}
+                <span className="text-2xl font-bold text-zinc-100">
+                  {chord.root}<span className="text-base font-medium">{chord.quality}</span>
+                </span>
+
+                {/* Delete Button */}
+                <button
+                  onClick={() => onRemoveChord(index)}
+                  className="absolute -top-2 -right-2 bg-zinc-900 border border-zinc-700 text-zinc-400 hover:text-rose-500 hover:border-rose-500 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all shadow-md z-10"
+                  aria-label="Remove chord"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+
+            {/* Spacer block so the user can scroll past the last item comfortably */}
+            <div className="w-2 shrink-0"></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
