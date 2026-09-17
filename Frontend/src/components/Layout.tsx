@@ -10,11 +10,13 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen w-full bg-zinc-950 text-zinc-300 overflow-hidden">
-      
+
       {/* Desktop & Tablet Sidebar */}
       <aside className="hidden md:flex flex-col w-20 lg:w-64 border-r border-zinc-800 bg-zinc-900/50">
         <div className="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-zinc-800">
-          <span className="text-amber-500 font-bold text-xl tracking-wider hidden lg:block">SONUSLAB</span>
+          <span className="text-amber-500 font-bold text-xl tracking-wider hidden lg:block">
+            <img src="SonusLab-full.png" className='w-25' alt="SonusLab" />
+          </span>
           <span className="text-amber-500 font-bold text-xl lg:hidden">SL</span>
         </div>
         <nav className="flex-1 py-6 flex flex-col gap-2 lg:px-4">
@@ -23,10 +25,9 @@ export default function Layout() {
               key={item.name}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-4 p-3 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-zinc-800 text-amber-500' 
-                    : 'hover:bg-zinc-800/50 hover:text-zinc-100'
+                `flex items-center gap-4 p-3 rounded-lg transition-colors ${isActive
+                  ? 'bg-zinc-800 text-amber-500'
+                  : 'hover:bg-zinc-800/50 hover:text-zinc-100'
                 }`
               }
             >
@@ -49,8 +50,7 @@ export default function Layout() {
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 p-2 ${
-                isActive ? 'text-amber-500' : 'text-zinc-500 hover:text-zinc-300'
+              `flex flex-col items-center gap-1 p-2 ${isActive ? 'text-amber-500' : 'text-zinc-500 hover:text-zinc-300'
               }`
             }
           >

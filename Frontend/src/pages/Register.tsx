@@ -57,7 +57,9 @@ export default function Register() {
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-amber-500 tracking-wider mb-2">SONUSLAB</h1>
+          <h1 className="text-3xl flex justify-center font-bold text-amber-500 tracking-wider mb-2">
+            <img src="SonusLab-full.png" className='w-25' alt="SonusLab" />
+          </h1>
           <p className="text-zinc-500 text-sm">Create your creator profile</p>
         </div>
 
