@@ -79,10 +79,9 @@ export const audioEngine = {
       notes: getNotesForChord(chord.root, chord.quality),
     }));
 
-    const part = new Tone.Part((time, value) => {
+    new Tone.Part((time, value) => {
       synth.triggerAttackRelease(value.notes, "1m", time);
 
-      // Tone.Draw safely pushes the update to React at the exact millisecond the chord plays
       if (onTick) {
         Tone.Draw.schedule(() => {
           onTick(value.index);
