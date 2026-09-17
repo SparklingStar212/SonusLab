@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import WorkspaceHeader from '../components/workspace/WorkspaceHeader';
@@ -13,6 +14,7 @@ export default function Workspace() {
   const navigate = useNavigate();
   const [song, setSong] = useState<Song | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
 
   // Store the timeout ID so we can cancel it if the user keeps typing
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -29,6 +31,30 @@ export default function Workspace() {
       })
       .catch(err => console.error("Failed to load tape:", err));
   }, [id]);
+
+  // STEP 10: Global Mobile Audio Unlock
+  // Safari/iOS requires a physical tap to allow audio playback.
+  // This catches their very first interaction with the app and unlocks the engine securely.
+  useEffect(() => {
+    const unlockAudio = async () => {
+      await Tone.start();
+      console.log("Audio Context Unlocked! Ready to rock.");
+
+      // Once unlocked, we don't need these listeners anymore
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+
+    // Listen for both mouse clicks and mobile screen taps
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+  }, []);
 
   const handleUpdateSong = (updatedFields: Partial<Song>) => {
     if (!song) return;
@@ -103,7 +129,6 @@ export default function Workspace() {
     handleUpdateSong({ progression: reorderedChords });
   };
 
-  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
 
   if (!song) return <div className="h-full flex items-center justify-center text-zinc-500">Loading tape...</div>;
 
