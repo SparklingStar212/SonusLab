@@ -43,7 +43,7 @@ export const api = {
     return res.json();
   },
   deleteSong: async (id: string): Promise<void> => {
-    const res = await fetch(`${BASE_URL}/songs/${id}`, {
+    const res = await fetch(`${BASE_URL}/api/songs/${id}`, {
       method: "DELETE",
       headers: getHeaders(),
     });
