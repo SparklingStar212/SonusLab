@@ -5,6 +5,7 @@ const User = require('../models/User');
 const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
 
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
