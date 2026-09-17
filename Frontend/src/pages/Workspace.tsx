@@ -2,12 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import WorkspaceHeader from '../components/workspace/WorkspaceHeader';
 import SectionBoard from '../components/workspace/SectionBoard';
-import type { Song, Section } from '../types';
+import type { Song, Section, Chord } from '../types';
 import { api } from '../services/api';
+import ChordPalette from '../components/workspace/ChordPalette';
+import ProgressionTimeline from '../components/workspace/ProgressionTimeline';
+import StudioTransport from '../components/workspace/StudioTransport';
 
 export default function Workspace() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate(); // <-- 1. Initialize navigate here
+  const navigate = useNavigate();
   const [song, setSong] = useState<Song | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -78,6 +81,28 @@ export default function Workspace() {
     }
   };
 
+  // 1. Add a new chord to the end of the timeline
+  const handleAddChord = (chordDef: { root: string; quality: string }) => {
+    if (!song) return;
+    const newChord = { ...chordDef, order: song.progression.length };
+    const newProgression = [...song.progression, newChord];
+    handleUpdateSong({ progression: newProgression });
+  };
+
+  // 2. Remove a specific block
+  const handleRemoveChord = (index: number) => {
+    if (!song) return;
+    const newProgression = song.progression.filter((_, i) => i !== index);
+    // Re-index the order property so the backend stays perfectly synced
+    const reindexed = newProgression.map((c, i) => ({ ...c, order: i }));
+    handleUpdateSong({ progression: reindexed });
+  };
+
+  // 3. Update the backend when chords are dragged into a new order
+  const handleReorderChords = (reorderedChords: Chord[]) => {
+    handleUpdateSong({ progression: reorderedChords });
+  };
+
   if (!song) return <div className="h-full flex items-center justify-center text-zinc-500">Loading tape...</div>;
 
   return (
@@ -85,10 +110,27 @@ export default function Workspace() {
       <WorkspaceHeader
         song={song}
         onUpdateSong={handleUpdateSong}
-        onDeleteSong={handleDeleteSong} // <-- 2. Moved to WorkspaceHeader
+        onDeleteSong={handleDeleteSong}
         isSaving={isSaving}
       />
       <main className="flex-1 p-4 md:p-8 max-w-3xl w-full mx-auto">
+        <ChordPalette
+          songKey={song.metadata.key}
+          onAddChord={handleAddChord}
+        />
+
+        {/* The Play/Stop Controls */}
+        <StudioTransport
+          bpm={song.metadata.bpm}
+          chords={song.progression}
+        />
+
+        <ProgressionTimeline
+          chords={song.progression}
+          onRemoveChord={handleRemoveChord}
+          onReorderChords={handleReorderChords}
+        />
+
         <SectionBoard
           sections={song.sections}
           onUpdateSections={(sections: Section[]) => handleUpdateSong({ sections })}

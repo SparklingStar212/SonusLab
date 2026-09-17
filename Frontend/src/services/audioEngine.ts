@@ -54,6 +54,45 @@ const getNotesForChord = (root: string, quality: string): string[] => {
 
 // 3. Export the engine methods
 export const audioEngine = {
+
+  // NEW: Set the global BPM based on the workspace header
+  setBpm: (bpm: number) => {
+    Tone.Transport.bpm.value = bpm;
+  },
+
+  // NEW: The core sequencer logic
+  playProgression: async (chords: {root: string, quality: string}[], bpm: number) => {
+    await Tone.start();
+    Tone.Transport.stop();
+    Tone.Transport.cancel(); // Clear any old sequences
+
+    audioEngine.setBpm(bpm);
+
+    // Map our chord array into Tone.js timing events (1 chord per beat/measure)
+    // We are using '1m' (one measure) per chord so you have time to flatpick over it!
+    const sequenceData = chords.map((chord, index) => ({
+      time: `${index}m`, 
+      notes: getNotesForChord(chord.root, chord.quality)
+    }));
+
+    // Create the Tone.js Part to handle playback scheduling
+    const part = new Tone.Part((time, value) => {
+      synth.triggerAttackRelease(value.notes, '1m', time);
+    }, sequenceData).start(0);
+
+    // Tell the transport to loop exactly the length of our progression
+    Tone.Transport.loop = true;
+    Tone.Transport.loopEnd = `${chords.length}m`;
+
+    Tone.Transport.start();
+  },
+
+  // NEW: Stop playback
+  stop: () => {
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+  },
+
   // Browsers require a user interaction (like a click) before audio can play
   init: async () => {
     await Tone.start();
