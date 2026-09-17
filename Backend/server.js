@@ -9,12 +9,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ADD THIS CUSTOM MIDDLEWARE: Security headers for Google Auth
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  next();
+});
+
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected to SonusLab Studio'))
   .catch(err => console.log('DB Connection Error:', err));
 
-// Route Mounts (We will create these next)
+// Route Mounts
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/songs', require('./routes/songRoutes'));
 

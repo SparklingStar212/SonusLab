@@ -32,4 +32,10 @@ export default defineConfig({
       },
     }),
   ],
+  // ADD THIS BLOCK: Allows the Google popup to talk to your app
+  server: {
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+    },
+  },
 });
